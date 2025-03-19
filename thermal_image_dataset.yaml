@@ -1,0 +1,18 @@
+path: "/scratch/sfberrio/FLIR_ADAS_1_3"  # Root directory relative to this YAML file
+
+# Paths to images
+train: "/scratch/sfberrio/FLIR_ADAS_1_3/train/thermal_8_bit_mini/images"  # Path to training images
+val: "/scratch/sfberrio/FLIR_ADAS_1_3/val/thermal_8_bit_mini/images"  # Path to validation images
+
+# Paths to labels
+#labels: "/scratch/sfberrio/FLIR_ADAS_1_3/train/thermal_8_bit_mini/labels"  # Path to training labels
+#val_labels: "/scratch/sfberrio/FLIR_ADAS_1_3/val/thermal_8_bit_mini/labels"  # Path to validation labels
+labels: "/scratch/sfberrio/FLIR_ADAS_1_3/train/yolo_labels"  # Path to training labels
+val_labels: "/scratch/sfberrio/FLIR_ADAS_1_3/val/yolo_labels"  # Path to validation labels
+
+dataset_name: FLIR_ADAS_1_3
+dataset_type: object_detection
+
+nc: 4  # Number of classes
+names: ['person', 'bicycle', 'car', 'dog']  # Class names (corrected 'dogs' → 'dog' for consistency)
+
