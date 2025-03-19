@@ -79,13 +79,20 @@ After you have done this the setup is complete just make sure if you aren't usin
 
 # Running the model 
 
-running the model is straightforward however some considerations. Yolov5 will run with CUDA automatically if it detects it, a good way to ensure you have CUDA avaiable is to runn the following command 
+running the model is straightforward however some considerations. Yolov5 will run with CUDA automatically if it detects it, a good way to ensure you have CUDA avaiable is to runn the following command If it prints TRUE go ahead and run the model, otherwise it will run on CPU and be MUCH slower. If you are using Sol CUDA should be available if you have requested a GPU when you created the session. 
 
 ```
 python -c "import torch; print(torch.cuda.is_available())"
 ```
+Also we need to move the lables we generated, could probably automate this at some point by allowing a specified path as a parameter for now for the mini tests just run this before running the model 
 
-If it prints TRUE go ahead and run the model, otherwise it will run on CPU and be MUCH slower. If you are using Sol CUDA should be available if you have requested a GPU when you created the session. 
+```
+mkdir -p /scratch/sfberrio/FLIR_ADAS_1_3/train/thermal_8_bit_mini/labels
+mkdir -p /scratch/sfberrio/FLIR_ADAS_1_3/val/thermal_8_bit_mini/labels
+mv /scratch/sfberrio/FLIR_ADAS_1_3/train/yolo_labels/* /scratch/sfberrio/FLIR_ADAS_1_3/train/thermal_8_bit_mini/labels/
+mv /scratch/sfberrio/FLIR_ADAS_1_3/val/yolo_labels/* /scratch/sfberrio/FLIR_ADAS_1_3/val/thermal_8_bit_mini/labels/
+```
+
 
 ```
 python train.py --img 640 --batch 4 --epochs 10 --data /path/to/yolov5/data/thermal_image_dataset.yaml --weights yolov5s.pt --cache
