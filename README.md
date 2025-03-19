@@ -10,6 +10,7 @@ The detect function will use the weights provided by train function to classify 
 To improve training speed we will use the ASU research computer labs SOL Supercomputer.
 
 Request access to SOL here: https://rto.asu.edu/forms/request-access-to-the-asu-supercomputers/
+
 New User Guide for SOL here: https://asurc.atlassian.net/wiki/spaces/RC/pages/1905721457/New+User+Guide
 
 
