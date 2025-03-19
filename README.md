@@ -7,8 +7,11 @@ The train function of YOLO takes a YAML file that directs it to folders containi
 
 The detect function will use the weights provided by train function to classify and label new images/videos.
 
-To improve training speed we will use the ASU research computer labs SOL Supercomputer. 
+To improve training speed we will use the ASU research computer labs SOL Supercomputer.
+
+Request access to SOL here: https://rto.asu.edu/forms/request-access-to-the-asu-supercomputers/
 New User Guide for SOL here: https://asurc.atlassian.net/wiki/spaces/RC/pages/1905721457/New+User+Guide
+
 
 The original dataset of images and annotations is found on kaggle. Link Here:
 
