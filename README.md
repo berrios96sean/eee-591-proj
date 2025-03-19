@@ -1,13 +1,23 @@
 # eee-591-proj
+Introduction:
 
 The goal of this project is to take a large dataset of ~8000 thermal images from a FLIR Tau2 camera, and train the "You Only Look Once" (YOLO) Object detection algorithm, implemented with PyTorch, to be able to detect and classify objects such as a car or person in new thermal video or images. 
+
+The train function of YOLO takes a YAML file that directs it to folders containing training and validation images and labels.
+
+The detect function will use the weights provided by train function to classify and label new images/videos.
 
 To improve training speed we will use the ASU research computer labs SOL Supercomputer. 
 New User Guide for SOL here: https://asurc.atlassian.net/wiki/spaces/RC/pages/1905721457/New+User+Guide
 
+The original dataset of images and annotations is found on kaggle. Link Here:
+
+We added the dataset to scratch so it can be accessed by the SOL Computer
+
 Instructions for training on Local Device (for those who are not ASU students) is also provided.
 
 Step 1.01 : login to SOL
+
 Step 1.02 : 
 
 
