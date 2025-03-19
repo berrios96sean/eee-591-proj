@@ -1,5 +1,16 @@
 # eee-591-proj
 
+The goal of this project is to take a large dataset of ~8000 thermal images from a FLIR Tau2 camera, and train the "You Only Look Once" (YOLO) Object detection algorithm, implemented with PyTorch, to be able to detect and classify objects such as a car or person in new thermal video or images. 
+
+To improve training speed we will use the ASU research computer labs SOL Supercomputer. 
+New User Guide for SOL here: https://asurc.atlassian.net/wiki/spaces/RC/pages/1905721457/New+User+Guide
+
+Instructions for training on Local Device (for those who are not ASU students) is also provided.
+
+Step 1.01 : login to SOL
+Step 1.02 : 
+
+
 # Important Note 
 
 Don't ever push any changes made inside of the Yolov5 submodule. Just run the makefile command in the root directory to move the yaml file to the data folder of yolov5 before moving forward with the following command 
