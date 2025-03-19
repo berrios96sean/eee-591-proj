@@ -90,3 +90,5 @@ If it prints TRUE go ahead and run the model, otherwise it will run on CPU and b
 ```
 python train.py --img 640 --batch 4 --epochs 10 --data /path/to/yolov5/data/thermal_image_dataset.yaml --weights yolov5s.pt --cache
 ```
+
+>> Note: Make sure when you run this you are still in the yolov5_env if you are using the conda environment. Otherwise you will keep running into dependecy issues. 
