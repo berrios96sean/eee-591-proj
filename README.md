@@ -84,15 +84,8 @@ running the model is straightforward however some considerations. Yolov5 will ru
 ```
 python -c "import torch; print(torch.cuda.is_available())"
 ```
-Also we need to move the lables we generated, could probably automate this at some point by allowing a specified path as a parameter for now for the mini tests just run this before running the model 
 
-```
-mkdir -p /scratch/sfberrio/FLIR_ADAS_1_3/train/thermal_8_bit_mini/labels
-mkdir -p /scratch/sfberrio/FLIR_ADAS_1_3/val/thermal_8_bit_mini/labels
-mv /scratch/sfberrio/FLIR_ADAS_1_3/train/yolo_labels/* /scratch/sfberrio/FLIR_ADAS_1_3/train/thermal_8_bit_mini/labels/
-mv /scratch/sfberrio/FLIR_ADAS_1_3/val/yolo_labels/* /scratch/sfberrio/FLIR_ADAS_1_3/val/thermal_8_bit_mini/labels/
-```
-
+it should be noted that I ran into alot of issues when using the oringinal conversion script.. before running make sure the .txt files have the same filename as the .jpeg files.. I have updated the script to do this as well but just in case you follow a different process than me 
 
 ```
 python train.py --img 640 --batch 4 --epochs 10 --data /path/to/yolov5/data/thermal_image_dataset.yaml --weights yolov5s.pt --cache
