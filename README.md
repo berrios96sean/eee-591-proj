@@ -1,5 +1,17 @@
 # eee-591-proj
 
+# Important Note 
+
+Don't ever push any changes made inside of the Yolov5 submodule. Just run the makefile command in the root directory to move the yaml file to the data folder of yolov5 before moving forward with the following command 
+
+```
+make add-yaml
+```
+
+Verify this is in the yolov5/data dir then proceed. 
+
+Do not ever to a `git add yolov5` this will screw things up. 
+
 # Dataset Directory on Sol Server
 Check that you have access to the scratch directory for the dataset run this and make sure you aren't seeing permission errors. 
 
