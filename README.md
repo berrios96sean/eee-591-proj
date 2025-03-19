@@ -30,7 +30,7 @@ source ~/.bashrc
 ```
 check that conda installed by doing `conda --version`
 
-## Activate env 
+## 2. Activate env 
 
 create and activate a conda environment with the following 
 ```
@@ -39,7 +39,7 @@ conda activate yolov5_env
 
 ```
 
-## install dependencies 
+## 3. install dependencies 
 go to or cd to yolov5 directory and run the following 
 
 ```
@@ -48,3 +48,45 @@ pip install -r requirements.txt
 ```
 
 this should work without issues. 
+
+# Setting up a mini project
+
+I've created some scripts to automate this process in the src directory and updated the original json conversion script. These only work if you have access to the /scratch directroy mentioned. Otherwise you will just need to adjust the location of the Dataset for where you have it stored. 
+
+## convert_json_to_yolo.py
+
+This has been updated to take in a parameter `--img_num 20` for example will create a folder `yolo_labels` in the scratch directory for both train and val. It will create the number of labels specified in `--img_num` otherwise if you don't specify a number it will generate all labels for every image example use below. 
+```
+python convert_json_to_yolo.py --img_num 20
+```
+
+I've also included a Makefile to delete those folders if you want to create more lables at some point, in the src directory just run 
+```
+make delete-labels
+```
+
+## create_thermal_8_bit_mini.py
+This script creates a folder named thermal_8_bit_mini in both train and val folders in the dataset location for the scratch directory. If you don't have access to the scratch directory then just modify it to where your dataset is. The same `--img_num` flag is used however you must specify a number for this script to work. Example use below
+```
+python create_thermal_8_bit_mini.py --img_num 20
+```
+
+A makefile command also exist to delete this directories if you want to test different numbers of images just run the following inside the src directory 
+```
+make delete-mini
+```
+After you have done this the setup is complete just make sure if you aren't using the dataset location you update the YAML file in `yolov5/data`
+
+# Running the model 
+
+running the model is straightforward however some considerations. Yolov5 will run with CUDA automatically if it detects it, a good way to ensure you have CUDA avaiable is to runn the following command 
+
+```
+python -c "import torch; print(torch.cuda.is_available())"
+```
+
+If it prints TRUE go ahead and run the model, otherwise it will run on CPU and be MUCH slower. If you are using Sol CUDA should be available if you have requested a GPU when you created the session. 
+
+```
+python train.py --img 640 --batch 4 --epochs 10 --data /path/to/yolov5/data/thermal_image_dataset.yaml --weights yolov5s.pt --cache
+```
