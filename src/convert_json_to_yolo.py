@@ -40,6 +40,7 @@ def convert_json_to_yolo(json_file, output_dir, img_num=None):
     os.makedirs(output_dir, exist_ok=True)
 
     # Process images and rename labels in FLIR_XXXXX format
+    temp_filenames = []  # Store generated filenames for renaming later
     for i, image_id in enumerate(image_ids, start=1):  # Start numbering from 1
         yolo_lines = []
         for ann in image_annotations[image_id]:
@@ -59,13 +60,41 @@ def convert_json_to_yolo(json_file, output_dir, img_num=None):
             yolo_lines.append(yolo_line)
 
         # New FLIR_XXXXX filename format (5-digit zero-padded)
-        new_filename = f"FLIR_{str(i).zfill(5)}.txt"
-        output_file = os.path.join(output_dir, new_filename)
+        temp_filename = f"FLIR_{str(i).zfill(5)}.txt"
+        output_file = os.path.join(output_dir, temp_filename)
+        temp_filenames.append(temp_filename)
 
         with open(output_file, 'w') as f:
             f.write('\n'.join(yolo_lines))
 
         print(f"✅ YOLO labels for image {image_id} saved as {output_file}")
+
+    return temp_filenames  # Return the generated filenames for renaming
+
+def rename_yolo_files(output_dir, image_dir, temp_filenames):
+    """
+    Renames YOLO label files to match image filenames in the thermal_8_bit/ folder.
+
+    Args:
+        output_dir (str): Directory containing YOLO label files.
+        image_dir (str): Directory containing image files.
+        temp_filenames (list): List of temporary YOLO filenames to rename.
+    """
+
+    # Get sorted image filenames (without extensions)
+    image_filenames = sorted(
+        [os.path.splitext(f)[0] for f in os.listdir(image_dir) if f.endswith(('.jpg', '.jpeg', '.png'))]
+    )
+
+    # Ensure we rename only as many files as exist
+    num_files_to_rename = min(len(temp_filenames), len(image_filenames))
+
+    for i in range(num_files_to_rename):
+        old_name = os.path.join(output_dir, temp_filenames[i])
+        new_name = os.path.join(output_dir, f"{image_filenames[i]}.txt")
+
+        os.rename(old_name, new_name)
+        print(f"🔄 Renamed {old_name} → {new_name}")
 
 # Command-line argument parsing
 parser = argparse.ArgumentParser(description="Convert COCO JSON annotations to YOLO format.")
@@ -80,10 +109,14 @@ splits = ["train", "val"]
 # Process both train and val annotations
 for split in splits:
     json_file_path = os.path.join(dataset_root, split, "thermal_annotations.json")
-    output_dir = os.path.join(dataset_root, split, "yolo_labels")  # Change to yolo_labels directory
+    image_dir = os.path.join(dataset_root, split, "thermal_8_bit")  # Image directory
+    output_dir = os.path.join(dataset_root, split, "yolo_labels")  # YOLO labels directory
 
     print(f"📂 Processing {split} annotations: {json_file_path} -> {output_dir}")
-    convert_json_to_yolo(json_file_path, output_dir, args.img_num)
+    temp_filenames = convert_json_to_yolo(json_file_path, output_dir, args.img_num)
 
-print("🎉 Conversion complete for both train and val datasets!")
+    # Rename generated YOLO files to match the image filenames
+    rename_yolo_files(output_dir, image_dir, temp_filenames)
+
+print("🎉 Conversion and renaming complete for both train and val datasets!")
 
