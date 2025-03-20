@@ -125,7 +125,7 @@ python -c "import torch; print(torch.cuda.is_available())"
 it should be noted that I ran into alot of issues when using the oringinal conversion script.. before running make sure the .txt files have the same filename as the .jpeg files.. I have updated the script to do this as well but just in case you follow a different process than me 
 
 ```
-python train.py --img 640 --batch 4 --epochs 10 --data /path/to/yolov5/data/thermal_image_dataset.yaml --weights yolov5s.pt --cache
+python train.py --img 640 --batch 4 --epochs 10 --data data/thermal_image_dataset.yaml --weights yolov5s.pt --cache
 ```
 
 >> Note: Make sure when you run this you are still in the yolov5_env if you are using the conda environment. Otherwise you will keep running into dependecy issues. 
