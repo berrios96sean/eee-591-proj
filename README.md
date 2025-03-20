@@ -116,6 +116,11 @@ After you have done this the setup is complete just make sure if you aren't usin
 
 # Running the model 
 
+>> NOTE: Before running the model go to the root directory and run the following Command after you have done the setup for the mini project.
+>> ```
+>> make setup-run
+>> ```
+
 running the model is straightforward however some considerations. Yolov5 will run with CUDA automatically if it detects it, a good way to ensure you have CUDA avaiable is to runn the following command If it prints TRUE go ahead and run the model, otherwise it will run on CPU and be MUCH slower. If you are using Sol CUDA should be available if you have requested a GPU when you created the session. 
 
 ```
