@@ -1,0 +1,7 @@
+4
+person
+bicycle
+car
+dog
+
+
