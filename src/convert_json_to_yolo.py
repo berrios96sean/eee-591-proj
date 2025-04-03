@@ -1,6 +1,10 @@
 import json
 import os
 import argparse
+import getpass
+
+username = getpass.getuser()
+
 
 def load_valid_classes(classes_file):
     """
@@ -64,7 +68,8 @@ def convert_json_to_yolo(json_file, output_dir, valid_classes, img_num=None):
         image_ids = image_ids[:img_num]  # Limit to specified number of images
 
     os.makedirs(output_dir, exist_ok=True)
-
+    #os.chmod(output_dir, 0o777)
+    
     # Process images and rename labels in FLIR_XXXXX format
     temp_filenames = []  # Store generated filenames for renaming later
     for i, image_id in enumerate(image_ids, start=1):  # Start numbering from 1
@@ -143,7 +148,7 @@ if not valid_classes:
 for split in splits:
     json_file_path = os.path.join(dataset_root, split, "thermal_annotations.json")
     image_dir = os.path.join(dataset_root, split, "thermal_8_bit")  # Image directory
-    output_dir = os.path.join(dataset_root, split, "yolo_labels")  # YOLO labels directory
+    output_dir = os.path.join(dataset_root, split, f"yolo_labels_{username}")  # YOLO labels directory
 
     print(f"📂 Processing {split} annotations: {json_file_path} -> {output_dir}")
     temp_filenames = convert_json_to_yolo(json_file_path, output_dir, valid_classes, args.img_num)

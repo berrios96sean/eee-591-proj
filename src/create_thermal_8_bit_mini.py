@@ -1,6 +1,14 @@
 import os
 import shutil
 import argparse
+import re
+import getpass
+
+username = getpass.getuser()
+
+def natural_sort_key(s):
+    """ Extract numbers from filenames and sort naturally (e.g., FLIR_1 before FLIR_10). """
+    return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', s)]
 
 def create_mini_dataset(source_dir, target_base_dir, img_num):
     """
@@ -22,8 +30,11 @@ def create_mini_dataset(source_dir, target_base_dir, img_num):
     target_images_dir = os.path.join(target_base_dir, "images")
     os.makedirs(target_images_dir, exist_ok=True)  # Create the target directory if it doesn't exist
 
-    # Get a sorted list of JPEG image files
-    image_files = sorted([f for f in os.listdir(source_dir) if f.lower().endswith(('.jpg', '.jpeg'))])
+    # Get a naturally sorted list of JPEG image files
+    image_files = sorted(
+        [f for f in os.listdir(source_dir) if f.lower().endswith(('.jpg', '.jpeg'))],
+        key=natural_sort_key  # Use natural sorting
+    )
 
     # Check if there are enough images
     if len(image_files) < img_num:
@@ -51,7 +62,7 @@ splits = ["train", "val"]
 
 for split in splits:
     source_images_dir = os.path.join(dataset_root, split, "thermal_8_bit")
-    target_base_dir = os.path.join(dataset_root, split, "thermal_8_bit_mini")
+    target_base_dir = os.path.join(dataset_root, split, f"thermal_8_bit_mini_{username}")
 
     print(f"Processing {split}: {source_images_dir} -> {target_base_dir}/images")
     create_mini_dataset(source_images_dir, target_base_dir, args.img_num)
