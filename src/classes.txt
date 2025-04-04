@@ -1,7 +1,7 @@
 4
 person
-bicycle
 car
+bicycle
 dog
 
 

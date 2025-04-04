@@ -8,7 +8,7 @@ model = YOLO("yolo11n.pt")
 model.info()
 
 # Train the model on the COCO8 example dataset for 100 epochs
-results = model.train(data="thermal_image_dataset.yaml", epochs=100, imgsz=640)
+results = model.train(data="thermal_image_dataset.yaml", epochs=30, imgsz=640)
 
 # Validate the model
 metrics = model.val(data="thermal_image_dataset.yaml")

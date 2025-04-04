@@ -6,66 +6,67 @@ import getpass
 
 username = getpass.getuser()
 
+# Manually adjustable train/val split ratio
+TRAIN_SPLIT_RATIO = 0.6  # Change this value to control the split ratio
+
 def natural_sort_key(s):
-    """ Extract numbers from filenames and sort naturally (e.g., FLIR_1 before FLIR_10). """
     return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', s)]
 
-def create_mini_dataset(source_dir, target_base_dir, img_num):
-    """
-    Creates a mini dataset by copying the first `img_num` JPEG images from source_dir
-    to a 'images' subdirectory inside target_base_dir.
-
-    Args:
-        source_dir (str): Path to the original full dataset directory.
-        target_base_dir (str): Path to the mini dataset base directory.
-        img_num (int): Number of images to copy.
-    """
-
-    # Ensure the source directory exists
+def create_mini_dataset_split(source_dir, target_root, start_idx, img_num):
     if not os.path.exists(source_dir):
         print(f"Error: Source directory {source_dir} does not exist.")
         return
 
-    # Define the target images directory inside 'thermal_8_bit_mini'
-    target_images_dir = os.path.join(target_base_dir, "images")
-    os.makedirs(target_images_dir, exist_ok=True)  # Create the target directory if it doesn't exist
-
-    # Get a naturally sorted list of JPEG image files
     image_files = sorted(
         [f for f in os.listdir(source_dir) if f.lower().endswith(('.jpg', '.jpeg'))],
-        key=natural_sort_key  # Use natural sorting
+        key=natural_sort_key
     )
 
-    # Check if there are enough images
-    if len(image_files) < img_num:
-        print(f"Warning: Requested {img_num} images, but only {len(image_files)} are available.")
-        img_num = len(image_files)  # Adjust to available images
+    total_available = len(image_files)
+    if start_idx >= total_available:
+        print(f"⚠️ Start index {start_idx} is beyond the number of available images ({total_available}).")
+        return
 
-    # Copy images
-    for i in range(img_num):
-        src_path = os.path.join(source_dir, image_files[i])
-        dest_path = os.path.join(target_images_dir, image_files[i])
-        shutil.copy(src_path, dest_path)
-        print(f"Copied: {src_path} -> {dest_path}")
+    selected_files = image_files[start_idx:start_idx + img_num] if img_num else image_files[start_idx:]
 
-    print(f"✅ Successfully created mini dataset with {img_num} images in {target_images_dir}\n")
+    num_selected = len(selected_files)
+    if num_selected < img_num:
+        print(f"⚠️ Requested {img_num} images but only {num_selected} are available from index {start_idx}.")
+
+    train_cutoff = int(num_selected * TRAIN_SPLIT_RATIO)
+    train_files = selected_files[:train_cutoff]
+    val_files = selected_files[train_cutoff:]
+
+    # Define output directories
+    train_target_dir = os.path.join(target_root, "train", f"thermal_8_bit_mini_{username}", "images")
+    val_target_dir = os.path.join(target_root, "val", f"thermal_8_bit_mini_{username}", "images")
+    os.makedirs(train_target_dir, exist_ok=True)
+    os.makedirs(val_target_dir, exist_ok=True)
+
+    for f in train_files:
+        shutil.copy(os.path.join(source_dir, f), os.path.join(train_target_dir, f))
+        print(f"📥 Train: {f}")
+
+    for f in val_files:
+        shutil.copy(os.path.join(source_dir, f), os.path.join(val_target_dir, f))
+        print(f"📥 Val: {f}")
+
+    print(f"✅ Successfully created split mini dataset: {len(train_files)} train / {len(val_files)} val\n")
 
 # Command-line argument parsing
-parser = argparse.ArgumentParser(description="Create a mini dataset by copying a subset of JPEG images.")
+parser = argparse.ArgumentParser(description="Create a split mini dataset by copying a subset of JPEG images.")
 parser.add_argument("--img_num", type=int, required=True, help="Number of images to copy.")
-
+parser.add_argument("--start_idx", type=int, default=0, help="Start index for image selection. Default: 0")
 args = parser.parse_args()
 
-# Define dataset paths
+# Define dataset root path and source
 dataset_root = "/scratch/sfberrio/FLIR_ADAS_1_3"
-splits = ["train", "val"]
+source_images_dir = os.path.join(dataset_root, "train", "thermal_8_bit")
 
-for split in splits:
-    source_images_dir = os.path.join(dataset_root, split, "thermal_8_bit")
-    target_base_dir = os.path.join(dataset_root, split, f"thermal_8_bit_mini_{username}")
+print(f"📂 Processing mini dataset creation from {source_images_dir} starting at index {args.start_idx}")
+print(f"📊 Train/Val split: {TRAIN_SPLIT_RATIO:.0%}/{(1 - TRAIN_SPLIT_RATIO):.0%}")
 
-    print(f"Processing {split}: {source_images_dir} -> {target_base_dir}/images")
-    create_mini_dataset(source_images_dir, target_base_dir, args.img_num)
+create_mini_dataset_split(source_images_dir, dataset_root, args.start_idx, args.img_num)
 
-print("✅ Mini dataset creation complete for both train and val.")
+print("✅ Mini dataset creation complete!")
 
