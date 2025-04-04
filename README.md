@@ -44,75 +44,38 @@ Check that you have access to the scratch directory for the dataset run this and
 cd /scratch/sfberrio/FLIR_ADAS_1_3/
 ```
 
-# Setting Up YOLOv5 with Miniconda and `requirements.txt` on Linux
-
-Sol Server seems to be using python 3.6 for me.. to install dependencies for yolov5 newer versions above 3.7 are needed the following is what worked for me. 
-
----
-
-## **1. Install Miniconda**
-If Miniconda is not installed, download and install it with the following commands:
-
-```bash
-# Download Miniconda installer
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-
-# Run the installer
-bash Miniconda3-latest-Linux-x86_64.sh
-```
-Follow the installation prompts leave the directory location empty to use the defualt install location. then once finished do the following 
-
-```
-source ~/.bashrc
-```
-check that conda installed by doing `conda --version`
-
-## 2. Activate env 
-
-create and activate a conda environment with the following 
-```
-conda create --name yolov5_env python=3.11 -y
-conda activate yolov5_env
-
-```
-
-## 3. install dependencies 
-go to or cd to yolov5 directory and run the following 
-
-```
-conda install pip -y
-pip install -r requirements.txt
-```
-
-this should work without issues. 
-
 # Setting up a mini project
 
-I've created some scripts to automate this process in the src directory and updated the original json conversion script. These only work if you have access to the /scratch directroy mentioned. Otherwise you will just need to adjust the location of the Dataset for where you have it stored. 
+## Cleaning generated labels and mini project
+I've updated this step to grab your userid and clean both labels and mini projects you've made using just this command 
 
-## convert_json_to_yolo.py
-
-This has been updated to take in a parameter `--img_num 20` for example will create a folder `yolo_labels` in the scratch directory for both train and val. It will create the number of labels specified in `--img_num` otherwise if you don't specify a number it will generate all labels for every image example use below. 
 ```
-python convert_json_to_yolo.py --img_num 20
+make clean
 ```
 
-I've also included a Makefile to delete those folders if you want to create more lables at some point, in the src directory just run 
+>> Important NOTE:
+>> I have update this process to use a single Make command which I'll explain below in detail. These scripts have been modifed to use only training data instead of validation data or images this has significantly improved results.
+
+The files mentioned below can be run with a single command from the src directory
+
 ```
-make delete-labels
+make run-all
+```
+The default img_num for this is 100. You can change this with the make command below 
+
+```
+make run-all IMG_NUM=1000
 ```
 
-## create_thermal_8_bit_mini.py
-This script creates a folder named thermal_8_bit_mini in both train and val folders in the dataset location for the scratch directory. If you don't have access to the scratch directory then just modify it to where your dataset is. The same `--img_num` flag is used however you must specify a number for this script to work. Example use below
+another flag has been added for the scripts and the make command as shown below
+
 ```
-python create_thermal_8_bit_mini.py --img_num 20
+make run-all IMG_NUM=1000 START_IDX=20
 ```
 
-A makefile command also exist to delete this directories if you want to test different numbers of images just run the following inside the src directory 
-```
-make delete-mini
-```
-After you have done this the setup is complete just make sure if you aren't using the dataset location you update the YAML file in `yolov5/data`
+This is an important step since the data set has over 14000 images training over the entire dataset is not really ideal. The start index flag allows us to modify the start location of the annotations and validations images we use for training for example setting `START_IDX=20` will start the process at FLIR_00020.jpeg instead of FLIR_00001.jpeg. I have went through a few runs and verified this works as intended and the results with just 30 epochs are pretty good so for with a `IMG_NUM=2000` it's also importatn to note that if we specify 2000 images I've updated the script to do a 60/40 split of the training data to the /train and /val folders instead of usingn images only from the /val folder. This has given better results so far. The idea behind the start index is so we can do cross validation to see if we have any success with that approach for improving precision. I have added a folder in the google drive with something like BEST-RESULTS and you can see the progress using 2000 images starting at FLIR_00001. 
+
+
 
 # Running the model 
 
@@ -127,10 +90,42 @@ running the model is straightforward however some considerations. Yolov5 will ru
 python -c "import torch; print(torch.cuda.is_available())"
 ```
 
-it should be noted that I ran into alot of issues when using the oringinal conversion script.. before running make sure the .txt files have the same filename as the .jpeg files.. I have updated the script to do this as well but just in case you follow a different process than me 
+Before running the run_yolo.py script make sure you update the parameters you want to use inside the file before the run then run 
 
 ```
-python train.py --img 640 --batch 4 --epochs 10 --data data/thermal_image_dataset.yaml --weights yolov5s.pt --cache
+python run_yolo.py
 ```
 
->> Note: Make sure when you run this you are still in the yolov5_env if you are using the conda environment. Otherwise you will keep running into dependecy issues. 
+# Additional Information for later use 
+IN the source directory I have a classes.txt file. This file is used for the annotation conversion.. the contents look something like this 
+
+```
+4
+person
+car
+bicycle
+dog
+```
+
+The reason behind this is because when we create the annotations for the images we only want to include the images for the classifications we are using. If you want to add more classes you can add them in this text file just keep in mind that the first line indicates the number of classes we are using fof example the `4` above indicates we have 4 classes listed in the lines below person, car, bicycle and dog. 
+
+Another important consideration is the order of the classes in the `classes.txt` file should match what is in the yaml. Rather than update the yaml file update the `gen_yaml.py` where the classes are listed for example this is directly form the script below 
+
+```
+nc: 4  # Number of classes
+names: ['person', 'car', 'bicycle', 'dog']  # Class names (corrected 'dogs' → 'dog' for consistency)
+```
+
+change `nc: ` to the number of classes you are using and the `names: ` to match the order of the classes in your `classes.txt` file. Then you can just run 
+
+```
+python gen_yaml.py
+```
+
+or 
+
+```
+make setup-run
+```
+
+as the command for generating the yaml is in the make command also. 
