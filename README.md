@@ -24,6 +24,10 @@ Step 1.01 : login to SOL
 
 Step 1.02 : 
 
+## screenshot of sol server set up
+![image](https://github.com/user-attachments/assets/feb8ac9c-5787-4cc3-a8a6-dbce40a763e1)
+
+
 
 # Important Note 
 
