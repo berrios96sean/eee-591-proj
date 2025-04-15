@@ -26,8 +26,8 @@ val_labels: "{val_labels}"  # Path to validation labels
 dataset_name: FLIR_ADAS_1_3
 dataset_type: object_detection
 
-nc: 4  # Number of classes
-names: ['person', 'car', 'bicycle', 'dog']  # Class names (corrected 'dogs' → 'dog' for consistency)
+nc: 6  # Number of classes
+names: ['person', 'car', 'bicycle', 'dog', 'Utility Pole', 'Sign']  # Class names (corrected 'dogs' → 'dog' for consistency)
 """
 
 # Write to file

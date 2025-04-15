@@ -1,7 +1,8 @@
-4
+6
 person
 car
 bicycle
 dog
-
+Utility Pole
+Sign
 
