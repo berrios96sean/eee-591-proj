@@ -1,8 +1,9 @@
-6
+7
 person
 car
 bicycle
 dog
 Utility Pole
 Sign
+Traffic Light
 
