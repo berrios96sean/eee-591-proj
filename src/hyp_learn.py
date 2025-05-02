@@ -1,4 +1,6 @@
 from ultralytics import YOLO
+import matplotlib.pyplot as plt
+import pandas as pd
 
 # NOTE: Yolo models 4/7 use darknet and are not included with ultralytics.
 
@@ -7,7 +9,7 @@ from ultralytics import YOLO
 #model = YOLO("yolov5n.pt")
 #model = YOLO("yolov6n.yaml")
 #model = YOLO("yolov8n.pt")
-#model = YOLO("yolov9c.pt")
+model = YOLO("yolov9c.pt")
 #model = YOLO("yolov10n.pt")
 #model = YOLO("yolov11n.pt")
 #model = YOLO("yolo12n.pt")
@@ -25,20 +27,33 @@ from ultralytics import YOLO
 # Run inference with the YOLOv5n model on the 'bus.jpg' image
 #results = model("path/to/bus.jpg")
 
-models = ["yolov9c.pt"]#, "yolov5n.pt", "yolov8n.pt", "yolov9c.pt"]
+learning_rates = [0.001, 0.005, 0.01, 0.05]
 map50s, precisions, recalls = [], [], []
 
-for m in models:
-    model = YOLO(m)
-    model.train(data="thermal_image_dataset.yaml", 
-            epochs=50,
-            imgsz=640,
-            batch=16,
-            lr0=0.001,
-            optimizer="Adam",
-            workers=4)
+for lr in learning_rates:
+    model.train(data="thermal_image_dataset.yaml", epochs=30, imgsz=640, batch=32, lr0=lr, optimizer="Adam")
     metrics = model.val(data="thermal_image_dataset.yaml")
+
     map50s.append(metrics.box.map50)
     precisions.append(metrics.box.mp)
     recalls.append(metrics.box.mr)
-  
+
+# Create a dictionary with the metrics
+data = {
+    "learning_rate": learning_rates,
+    "mAP50": map50s,
+    "precision": precisions,
+    "recall": recalls
+}
+
+# Convert to a DataFrame and save to CSV
+df = pd.DataFrame(data)
+df.to_csv("hyp_learning_rates_yolov9.csv", index=False)
+
+
+
+
+
+
+
+
